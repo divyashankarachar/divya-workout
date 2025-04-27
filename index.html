@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker - PPCL Split</title>
+    <style>
+        :root {
+            --primary: #6b46c1;
+            --primary-light: #9f7aea;
+            --primary-dark: #553c9a;
+            --secondary: #f56565;
+            --gray-light: #f7fafc;
+            --gray: #e2e8f0;
+            --gray-dark: #4a5568;
+            --white: #ffffff;
+            --black: #1a202c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray-light);
+            color: var(--black);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 1rem;
+        }
+        
+        .day-selector {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .day-btn {
+            flex: 1;
+            padding: 0.75rem;
+            margin: 0 0.25rem;
+            background-color: var(--gray);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 80px;
+            transition: all 0.3s ease;
+        }
+        
+        .day-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .day-btn:hover:not(.active) {
+            background-color: var(--primary-light);
+            color: var(--white);
+        }
+        
+        .workout-section {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .exercise-card {
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background-color: var(--white);
+        }
+        
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .exercise-header h3 {
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        .exercise-content {
+            display: none;
+            padding: 1rem;
+        }
+        
+        .exercise-content.active {
+            display: block;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+            background-color: var(--gray);
+            height: 200px;
+        }
+        
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .exercise-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .set-tracker {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .set-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--gray);
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .set-btn.completed {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        .tooltip {
+            background-color: var(--primary-light);
+            color: var(--white);
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .stretch-card {
+            padding: 0.75rem;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stretch-card h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .stretch-card p {
+            font-size: 0.85rem;
+            color: var(--gray-dark);
+        }
+        
+        .tab-container {
+            margin-bottom: 1rem;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 0.5rem;
+            text-align: center;
+            background-color: var(--gray);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1rem;
+            background-color: var(--white);
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1rem;
+            color: var(--gray-dark);
+            font-size: 0.85rem;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 600px) {
+            .day-selector {
+                padding: 0.25rem;
+            }
+            
+            .day-btn {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PPCL Workout Plan</h1>
+            <p>Fat Loss & Lean Muscle Gain</p>
+        </header>
+        
+        <div class="day-selector">
+            <button class="day-btn" data-day="0">Sun<br>Rest</button>
+            <button class="day-btn" data-day="1">Mon<br>Push</button>
+            <button class="day-btn" data-day="2">Tue<br>Pull</button>
+            <button class="day-btn" data-day="3">Wed<br>Core</button>
+            <button class="day-btn" data-day="4">Thu<br>Legs</button>
+            <button class="day-btn" data-day="5">Fri<br>Push</button>
+            <button class="day-btn" data-day="6">Sat<br>Pull</button>
+        </div>
+        
+        <div id="workout-container">
+            <!-- Content will be loaded here... -->
+        </div>
+    </div>
+    
+    <script>
+        // Workout data
+        const workoutData = {
+            cardio: {
+                title: "Morning Cardio",
+                exercises: [
+                    {
+                        name: "Bodyweight Squats",
+                        sets: 1,
+                        reps: 30,
+                        tip: "Keep your chest up and knees tracking over toes",
+                        video: "videos/Bodyweight_Squats.mp4"
+                    },
+                    {
+                        name: "Jumping Jacks",
+                        sets: 1,
+                        reps: 120,
+                        tip: "Stay light on your feet and maintain good posture",
+                        video: "videos/Jumping_Jacks.mp4"
+                    },
+                    {
+                        name: "Skip Ropes",
+                        sets: 1,
+                        reps: 100,
+                        tip: "Use your wrists, not your arms, to spin the rope",
+                        video: "videos/Skip_Ropes.mp4"
+                    }
+                ]
+            },
+            push: {
+                title: "Push Day (Chest, Shoulders, Triceps)",
+                exercises: [
+                    {
+                        name: "Dumbbell Shoulder Press",
+                        sets: 3,
+                        reps: 10,
+                        weight: "3.3-5 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Keep core engaged, don't arch your back",
+                        video: "videos/Dumbbell_Shoulder_Press.mp4"
+                    },
+                    {
+                        name: "Weighted Push-Ups",
+                        sets: 3,
+                        reps: 8,
+                        weight: "5 kg plate",
+                        progression: "Add 1 rep per week, then increase weight when you reach 10 reps",
+                        tip: "Place the weight on your upper back. Keep your body in a straight line",
+                        video: "videos/Weighted_Push_Ups.mp4"
+                    },
+                    {
+                        name: "Incline Dumbbell Press",
+                        sets: 3,
+                        reps: 10,
+                        weight: "3.3 kg each",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Use a chair or bench at 30-45 degree angle",
+                        video: "videos/Incline_Dumbbell_Press.mp4"
+                    },
+                    {
+                        name: "Lateral Raises",
+                        sets: 3,
+                        reps: 12,
+                        weight: "3.3 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 15 reps",
+                        tip: "Slight bend in elbows, raise to shoulder height only",
+                        video: "videos/Lateral_Raises.mp4"
+                    },
+                    {
+                        name: "Tricep Dips",
+                        sets: 3,
+                        reps: 12,
+                        weight: "Bodyweight",
+                        progression: "Add 1 rep per week, then add weight when you reach 15 reps",
+                        tip: "Keep elbows pointing backward, not flaring out",
+                        video: "videos/Tricep_Dips.mp4"
+                    },
+                    {
+                        name: "Barbell Floor Press",
+                        sets: 3,
+                        reps: 10,
+                        weight: "10 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Keep your upper arms in contact with the floor throughout the movement",
+                        video: "videos/Barbell_Floor_Press.mp4"
+                    }
+                ],
+                stretches: [
+                    {
+                        name: "Child's Pose",
+                        description: "Kneel on floor, sit back on heels, extend arms forward. Hold for 30 seconds."
+                    },
+                    {
+                        name: "Cross-Body Shoulder Stretch",
+                        description: "Bring arm across chest, hold with opposite arm. 30 seconds each side."
+                    },
+                    {
+                        name: "Doorway Chest Stretch",
+                        description: "Place forearms on doorway, step through slightly. Hold 30 seconds."
+                    }
+                ]
+            },
+            pull: {
+                title: "Pull Day (Back, Biceps)",
+                exercises: [
+                    {
+                        name: "Bent-Over Barbell Row",
+                        sets: 3,
+                        reps: 12,
+                        weight: "10-15 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 15 reps",
+                        tip: "Keep back flat, pull to lower ribs",
+                        video: "videos/Bent_Over_Barbell_Row.mp4"
+                    },
+                    {
+                        name: "Reverse Flys",
+                        sets: 3,
+                        reps: 12,
+                        weight: "3.3 kg each",
+                        progression: "Add 1 rep per week, then increase weight when you reach 15 reps",
+                        tip: "Slight bend in elbows, squeeze shoulder blades together",
+                        video: "videos/Reverse_Flys.mp4"
+                    },
+                    {
+                        name: "Barbell Deadlifts",
+                        sets: 3,
+                        reps: 10,
+                        weight: "10-15 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Push through heels, keep back flat and core engaged",
+                        video: "videos/Barbell_Deadlifts.mp4"
+                    },
+                    {
+                        name: "Face Pulls",
+                        sets: 3,
+                        reps: 12,
+                        weight: "Resistance Band",
+                        progression: "Add 1 rep per week, then increase resistance when you reach 15 reps",
+                        tip: "Pull band to eye level, elbows high",
+                        video: "videos/Face_Pulls.mp4"
+                    },
+                    {
+                        name: "Hammer Curls",
+                        sets: 3,
+                        reps: "10 per side",
+                        weight: "3.3 kg each",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Keep elbows fixed at sides, thumbs pointing up",
+                        video: "videos/Hammer_Curls.mp4"
+                    },
+                    {
+                        name: "Supermans",
+                        sets: 3,
+                        reps: 15,
+                        weight: "Bodyweight",
+                        progression: "Add 1 rep per week until you reach 20 reps",
+                        tip: "Lift chest and legs simultaneously, squeeze glutes",
+                        video: "videos/Supermans.mp4"
+                    }
+                ],
+                stretches: [
+                    {
+                        name: "Seated Forward Fold",
+                        description: "Sit with legs extended, reach for toes. Hold for 30 seconds."
+                    },
+                    {
+                        name: "Cat-Cow",
+                        description: "On hands and knees, alternate between arching and rounding back. 10 repetitions."
+                    },
+                    {
+                        name: "Standing Lat Stretch",
+                        description: "Grab doorway or pole, lean away to feel stretch in lats. 30 seconds each side."
+                    }
+                ]
+            },
+            core: {
+                title: "Core Day (Abs, Obliques, Stability)",
+                exercises: [
+                    {
+                        name: "Weighted Russian Twists",
+                        sets: 3,
+                        reps: "12 per side",
+                        weight: "3.3 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 15 reps per side",
+                        tip: "Keep chest up and back straight",
+                        video: "videos/Weighted_Russian_Twists.mp4"
+                    },
+                    {
+                        name: "Lying Leg Raises",
+                        sets: 3,
+                        reps: 12,
+                        weight: "Bodyweight",
+                        progression: "Add 1 rep per week until you reach 15 reps",
+                        tip: "Press lower back into floor throughout movement",
+                        video: "videos/Lying_Leg_Raises.mp4"
+                    },
+                    {
+                        name: "Plank Shoulder Taps",
+                        sets: 3,
+                        reps: 20,
+                        weight: "Bodyweight",
+                        progression: "Add 2 reps per week until you reach 30 reps",
+                        tip: "Minimize hip rotation, keep core engaged",
+                        video: "videos/Plank_Shoulder_Taps.mp4"
+                    },
+                    {
+                        name: "Side Plank Hip Dips",
+                        sets: 3,
+                        reps: "10 per side",
+                        weight: "Bodyweight",
+                        progression: "Add 1 rep per week until you reach 15 per side",
+                        tip: "Stack shoulders, hips and feet in straight line",
+                        video: "videos/Side_Plank_Hip_Dips.mp4"
+                    },
+                    {
+                        name: "Dead Bug",
+                        sets: 3,
+                        reps: 10,
+                        weight: "5 kg plate overhead",
+                        progression: "Add 1 rep per week until you reach 15 reps",
+                        tip: "Press lower back into floor, move limbs slowly",
+                        video: "videos/Dead_Bug.mp4"
+                    },
+                    {
+                        name: "Bicycle Crunches",
+                        sets: 3,
+                        reps: "15 per side",
+                        weight: "Bodyweight",
+                        progression: "Add 2 reps per side per week until you reach 25 per side",
+                        tip: "Focus on rotation and core engagement, not speed",
+                        video: "videos/Bicycle_Crunches.mp4"
+                    }
+                ],
+                stretches: [
+                    {
+                        name: "Cobra Stretch",
+                        description: "Lie face down, push up with arms to arch back. Hold for 30 seconds."
+                    },
+                    {
+                        name: "Seated Spinal Twist",
+                        description: "Sit with one leg extended, other crossed over. Twist toward bent knee. 30 seconds each side."
+                    },
+                    {
+                        name: "Kneeling Hip Flexor Stretch",
+                        description: "Kneel on one knee, push hips forward. 30 seconds each side."
+                    }
+                ]
+            },
+            legs: {
+                title: "Legs Day (Quads, Glutes, Hamstrings)",
+                exercises: [
+                    {
+                        name: "Bulgarian Split Squats",
+                        sets: 3,
+                        reps: "8 per leg",
+                        weight: "3.3-5 kg dumbbells",
+                        progression: "Add 1 rep per week, then increase weight when you reach 10 reps per leg",
+                        tip: "Keep front knee tracking over toes, chest up",
+                        video: "videos/Bulgarian_Split_Squats.mp4"
+                    },
+                    {
+                        name: "Barbell Hip Thrusts",
+                        sets: 3,
+                        reps: 12,
+                        weight: "10-15 kg",
+                        progression: "Add 1 rep per week, then increase weight when you reach 15 reps",
+                        tip: "Drive through heels, squeeze glutes at top",
+                        video: "videos/Barbell_Hip_Thrusts.mp4"
+                    },
+                    {
+                        name: "Goblet Squats",
+                        sets: 3,
+                        reps: 10,
+                        weight: "5 kg dumbbell",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Keep weight close to chest, knees in line with toes",
+                        video: "videos/Goblet_Squats.mp4"
+                    },
+                    {
+                        name: "Romanian Deadlifts",
+                        sets: 3,
+                        reps: 10,
+                        weight: "10 kg barbell",
+                        progression: "Add 1 rep per week, then increase weight when you reach 12 reps",
+                        tip: "Slight bend in knees, hinge at hips, maintain flat back",
+                        video: "videos/Romanian_Deadlifts.mp4"
+                    },
+                    {
+                        name: "Calf Raises",
+                        sets: 3,
+                        reps: 15,
+                        weight: "5 kg plate",
+                        progression: "Add 2 reps per week, then increase weight when you reach 20 reps",
+                        tip: "Full range of motion, pause at top and bottom",
+                        video: "videos/Calf_Raises.mp4"
+                    },
+                    {
+                        name: "Step-Ups",
+                        sets: 3,
+                        reps: "8 per leg",
+                        weight: "3.3 kg dumbbells",
+                        progression: "Add 1 rep per week, then increase weight when you reach 10 reps per leg",
+                        tip: "Drive through heel of elevated foot",
+                        video: "videos/Step_Ups.mp4"
+                    }
+                ],
+                stretches: [
+                    {
+                        name: "Standing Quad Stretch",
+                        description: "Hold foot behind you, knee pointing down. 30 seconds each leg."
+                    },
+                    {
+                        name: "Figure-4 Glute Stretch",
+                        description: "Cross ankle over opposite knee, sit back. 30 seconds each side."
+                    },
+                    {
+                        name: "Butterfly Stretch",
+                        description: "Soles of feet together, knees out. Hold for 30 seconds."
+                    }
+                ]
+            }
+        };
+        
+        // Day to workout type mapping
+        const dayToWorkout = {
+            0: [], // Sunday - Rest day
+            1: ["cardio", "push"], // Monday
+            2: ["cardio", "pull"], // Tuesday
+            3: ["cardio", "core"], // Wednesday
+            4: ["cardio", "legs"], // Thursday
+            5: ["cardio", "push"], // Friday
+            6: ["cardio", "pull"]  // Saturday
+        };
+        
+        // Function to handle video errors
+        function handleVideoError(videoElement) {
+            videoElement.parentElement.innerHTML = `
+                <div style="height: 100%; display: flex; align-items: center; justify-content: center; background-color: var(--gray); color: var(--gray-dark);">
+                    <div style="text-align: center;">
+                        <p><strong>Video not available</strong></p>
+                        <p style="font-size: 0.8rem;">Check video path and format</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Get today's workout plan
+        function getTodayWorkout() {
+            const today = new Date().getDay();
+            return dayToWorkout[today];
+        }
+        
+        // Load workout for a specific day
+        function loadWorkout(day) {
+            const workouts = dayToWorkout[day];
+            const container = document.getElementById('workout-container');
+            container.innerHTML = '';
+            
+            if (workouts.length === 0) {
+                container.innerHTML = `
+                    <div class="workout-section">
+                        <div class="section-title">Rest Day</div>
+                        <p>Today is your rest day! Focus on:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Getting 7-9 hours of quality sleep</li>
+                            <li>Staying hydrated (aim for 2-3 liters of water)</li>
+                            <li>Light stretching or mobility work if desired</li>
+                            <li>Proper nutrition (protein target: 110-137g)</li>
+                        </ul>
+                    </div>
+                `;
+                return;
+            }
+            
+            workouts.forEach(workoutType => {
+                const workout = workoutData[workoutType];
+                
+                const workoutSection = document.createElement('div');
+                workoutSection.className = 'workout-section';
+                
+                // Section title
+                const sectionTitle = document.createElement('div');
+                sectionTitle.className = 'section-title';
+                sectionTitle.innerHTML = `
+                    <span>${workout.title}</span>
+                    <span><button class="btn btn-sm btn-outline" onclick="markAllComplete(this)">Mark All Complete</button></span>
+                `;
+                workoutSection.appendChild(sectionTitle);
+                
+                // Exercise cards
+                workout.exercises.forEach((exercise, index) => {
+                    const exerciseCard = document.createElement('div');
+                    exerciseCard.className = 'exercise-card';
+                    
+                    exerciseCard.innerHTML = `
+                        <div class="exercise-header" onclick="toggleExercise(this)">
+                            <h3>${index + 1}. ${exercise.name}</h3>
+                            <span>${exercise.sets} sets × ${exercise.reps} reps ${exercise.weight ? '| ' + exercise.weight : ''}</span>
+                        </div>
+                        <div class="exercise-content">
+                            <div class="video-container">
+                                <video controls onerror="handleVideoError(this)">
+                                    <source src="${exercise.video}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="exercise-info">
+                                <div>Sets: ${exercise.sets} × Reps: ${exercise.reps}</div>
+                                <div>${exercise.weight || ''}</div>
+                            </div>
+                            <div class="set-tracker">
+                                ${Array(exercise.sets).fill().map((_, i) => `
+                                    <div class="set-btn" onclick="toggleSetComplete(this)">${i + 1}</div>
+                                `).join('')}
+                            </div>
+                            <div class="tooltip">
+                                <strong>Form Tip:</strong> ${exercise.tip}
+                            </div>
+                            ${exercise.progression ? `
+                                <div class="tooltip" style="background-color: var(--secondary);">
+                                    <strong>Progressive Overload:</strong> ${exercise.progression}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    workoutSection.appendChild(exerciseCard);
+                });
+                
+                // Stretches if available
+                if (workout.stretches) {
+                    const stretchSection = document.createElement('div');
+                    stretchSection.innerHTML = `
+                        <div class="section-title" style="margin-top: 1.5rem;">Post-Workout Stretches</div>
+                    `;
+                    
+                    workout.stretches.forEach(stretch => {
+                        const stretchCard = document.createElement('div');
+                        stretchCard.className = 'stretch-card';
+                        stretchCard.innerHTML = `
+                            <h4>${stretch.name}</h4>
+                            <p>${stretch.description}</p>
+                        `;
+                        stretchSection.appendChild(stretchCard);
+                    });
+                    
+                    workoutSection.appendChild(stretchSection);
+                }
+                
+                container.appendChild(workoutSection);
+            });
+            
+            // Add nutrition tips
+            const nutritionSection = document.createElement('div');
+            nutritionSection.className = 'workout-section';
+            nutritionSection.innerHTML = `
+                <div class="section-title">Nutrition & Recovery Tips</div>
+                <ul style="margin-left: 1.5rem;">
+                    <li><strong>Protein Target:</strong> 110-137g/day (1.6-2g/kg)</li>
+                    <li><strong>Recovery:</strong> Aim for 7-9 hours of sleep</li>
+                    <li><strong>Hydration:</strong> 2-3 liters of water daily</li>
+                    <li><strong>Form Priority:</strong> Always prioritize proper form over heavier weights</li>
+                </ul>
+            `;
+            container.appendChild(nutritionSection);
+        }
+        
+        // Toggle exercise details
+        function toggleExercise(element) {
+            const content = element.nextElementSibling;
+            content.classList.toggle('active');
+        }
+        
+        // Toggle set completion
+        function toggleSetComplete(element) {
+            element.classList.toggle('completed');
+        }
+        
+        // Mark all exercises as complete
+        function markAllComplete(element) {
+            const section = element.closest('.workout-section');
+            const setButtons = section.querySelectorAll('.set-btn');
+            
+            setButtons.forEach(btn => {
+                btn.classList.add('completed');
+            });
+        }
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date and highlight current day
+            const today = new Date().getDay();
+            document.querySelector(`.day-btn[data-day="${today}"]`).classList.add('active');
+            
+            // Load today's workout
+            loadWorkout(today);
+            
+            // Add event listeners to day selector buttons
+            const dayButtons = document.querySelectorAll('.day-btn');
+            dayButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    dayButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadWorkout(parseInt(this.dataset.day));
+                });
+            });
+        });
+    </script>
+    
+    <footer>
+        <p>PPCL Split Workout App for Fat Loss & Lean Muscle Gain</p>
+    </footer>
+</body>
+</html>
